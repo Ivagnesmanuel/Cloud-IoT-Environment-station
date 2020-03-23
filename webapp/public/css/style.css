@@ -1,0 +1,13 @@
+body{
+  background: #333;
+  color: #fff;
+}
+
+.jumbotron{
+  color: #333;
+}
+
+
+.nav-user{
+  text-transform: capitalize;
+}

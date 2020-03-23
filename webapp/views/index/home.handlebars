@@ -1,0 +1,61 @@
+
+<div class="jumbotron text-center" id="box">
+
+    <div class="card card-body mb-2">
+      <h2 align="center">Temperature &nbsp; <i class="fa fa-thermometer-half"></i>  </h2>
+      <div id="temp"></div>
+    </div>
+
+    <div class="card card-body mb-2">
+      <h2 align="center">Humidity  &nbsp; <i class="fa fa-tint"></i> </h2>
+      <div id="hum"></div>
+    </div>
+
+    <div class="card card-body mb-2">
+      <h2 align="center">Wind direction &nbsp; <i class="fas fa-arrows-alt-h"></i> </h2>
+      <div id="dir"></div>
+    </div>
+
+    <div class="card card-body mb-2">
+      <h2 align="center">Wind intensity  &nbsp;  <i class="fa fa-wind"></i> </h2>
+      <div id="int"></div>
+    </div>
+
+    <div class="card card-body mb-2">
+      <h2 align="center">Rain height &nbsp;  <i class="fas fa-cloud-rain"></i> </h2>
+      <div id="hei"></div>
+    </div>
+
+  </div><br><br><br>
+
+  <script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+
+  //each event is associated with the corresponding div in order to show the received value
+  socket.on('temperature', function(data){
+      var payload = data.split(" ");
+      $('#temp').html('<h4 align="center">' + payload[0] + '&nbsp; °C </h4>');
+  });
+
+  socket.on('humidity', function(data){
+      var payload = data.split(" ");
+      $('#hum').html('<h4 align="center">' + payload[0] + '&nbsp; % </h4>');
+  });
+
+  socket.on('direction', function(data){
+      var payload = data.split(" ");
+      $('#dir').html('<h4 align="center">' + payload[0] + '&nbsp; degrees </h4>');
+  });
+
+  socket.on('intensity', function(data){
+      var payload = data.split(" ");
+      $('#int').html('<h4 align="center">' + payload[0] + '&nbsp; m/s </h4>');
+  });
+
+  socket.on('height', function(data){
+      var payload = data.split(" ");
+      $('#hei').html('<h4 align="center">' + payload[0] + '&nbsp; mm/h </h4>');
+  });
+
+</script>

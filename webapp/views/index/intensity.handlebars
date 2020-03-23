@@ -1,0 +1,17 @@
+<div class="jumbotron text-center">
+    <h1> Wind intensity  &nbsp; <i class="fa fa-wind"></i> </h1>
+
+    {{#each metrics}}
+      <div class="card card-body mb-2">
+        <p><b>Date:</b> {{formatDate date 'MMMM Do YYYY'}}  &nbsp; <b>Time:</b> {{formatDate date 'HH:mm:ss'}}</p>
+        <h6 align="center">{{value}} m/s</h6>
+      </div>
+      {{else}}
+          <p>No metrics found for the last hour</p>
+      {{/each}}
+
+      {{#if total}}
+        <a class="btn btn-secondary" href="/inttotal" role="button"> &nbsp; &nbsp; See everything &nbsp; &nbsp;</a>
+      {{/if}}
+
+  </div><br><br><br>
