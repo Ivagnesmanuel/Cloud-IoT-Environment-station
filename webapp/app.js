@@ -11,7 +11,7 @@ var app = express();
 var server = require('http').createServer(app);     //needed for websocket
 var io = require('socket.io')(server);
 
-const port = process.env.PORT || 3000;              
+const port = process.env.PORT || 3000;
 server.listen(port, ()=>{
   console.log(`Server started on port ${port}`);
 } );
@@ -35,8 +35,7 @@ const Telemetry = mongoose.model('telemetries');
 
 
 
-
-/////////////  websocket + google code for MQTT Asynchronous Pull
+//  websocket + google code for MQTT Asynchronous Pull
 io.on('connection', function (socket) {
   //console.log(`websocket started`);
   // Creates a client; cache this for further use
@@ -84,7 +83,7 @@ io.on('connection', function (socket) {
           .save()
           .then(event => {
           res.redirect('/')
-        }).catch(err => console.log('Saved'));
+        }).catch(err => console.log('Asynchronous save'));
 
       };
 
