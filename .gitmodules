@@ -1,0 +1,3 @@
+[submodule "devices_RIOT/RIOT"]
+	path = devices_RIOT/RIOT
+	url = https://github.com/RIOT-OS/RIOT
