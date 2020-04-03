@@ -1,22 +1,28 @@
-# IoT-assignements
+# IOT environmental station
 
-## Assignment 1
-For this assignment I had to build a cloud-based IoT system that collects information from a set of virtual environmental sensors using the MQTT protocol. Moreover, I also had to build a simple web site to display the data collected from the sensors. The MQTT is controlled by the cloud-based backend, Google cloud IoT platform in my case.
+The goal of this project is to build a cloud-based IoT system that collects information from a set of environmental sensors using the MQTT protocol, which is controlled by a Google cloud IoT platform backend, implementing the Core-IoT and Pub/Sub API.
+To visualize the results, I have also implemented a dashboard, showing the current values, the last hour values and finally all the values collected by the application.
 
-### links
-- [youtube demonstration](https://www.youtube.com/watch?v=zbz2qDqulvs)
-- [Blog Post](https://www.hackster.io/ivagnesmanuel/iot-2020-assignment1-13aa68)
+To understand how does it work, I suggest you to take a look at the hands-on tutorials and the Youtube demonstrations.
+These are divided in 2 parts, in the first one I explain how to work with virtual sensors implemented by very simple Node.js programs, in the second part I extend the project implementing also RIOT-OS sensors, which can work also on real hardware devices.
 
-
-
-## Assignment 2
-For this assignment I had to build on-top of the cloud-based components developed in the first assignment. I had to replace the virtual environmental stations with new ones built using the RIOT-OS and MQTT-SN protocol. I also used the native emulator of RIOT-OS to run my stations and generate values over MQTT-SN that need to arrive to the cloud via the MQTT.
+## Part 1
+Introduction to the project, Node.js virtual sensors and dashboard
 
 ### links
-- [youtube demonstration](https://www.youtube.com/watch?v=IvsX66aO3TI)
-- [Blog Post](https://www.hackster.io/ivagnesmanuel/iot-2020-assignment2-5069b8)
+- [Youtube demonstration](https://www.youtube.com/watch?v=zbz2qDqulvs)
+- [Hands-on tutorial](https://www.hackster.io/ivagnesmanuel/iot-2020-assignment1-13aa68)
 
 
 
-**Note**: the code is made to work with my credentials on my personal google account.
+## Part 2
+Build on-top of the cloud-based components developed in the first part, here there is the extension including the RIOT-OS devices, the MQTT-SN protocol and the transparent gateway.
+
+### links
+- [Youtube demonstration](https://www.youtube.com/watch?v=IvsX66aO3TI)
+- [Hands-on tutorial](https://www.hackster.io/ivagnesmanuel/iot-2020-assignment2-5069b8)
+
+
+
+**Note**: All the code is made to work with my credentials on my personal google account.
 I did not upload the keys, If u want to run it, you need to make your own setup.
