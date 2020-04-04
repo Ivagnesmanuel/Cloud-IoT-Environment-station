@@ -1,4 +1,4 @@
-This folder contains the introduction to the project, Node.js virtual sensors and dashboard.
+This folder contains the Node.js virtual sensors used for the first part of the project.
 
 ### links
 - [Youtube demonstration](https://www.youtube.com/watch?v=zbz2qDqulvs)
