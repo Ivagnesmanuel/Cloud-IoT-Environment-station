@@ -2,9 +2,17 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
-//load model
-require('./../models/Telemetry');
-const Telemetry = mongoose.model('telemetries');
+//load models
+require('./../models/Temperature');
+require('./../models/Humidity');
+require('./../models/Direction');
+require('./../models/Intensity');
+require('./../models/Height');
+const Temperature = mongoose.model('temperatureValues');
+const Humidity = mongoose.model('humidityValues');
+const Direction = mongoose.model('directionValues');
+const Intensity = mongoose.model('intensityValues');
+const Height = mongoose.model('heightValues');
 
 
 //index route
@@ -12,12 +20,10 @@ router.get('/', (req,res) => {
     res.render('index/home');
 })
 
-
-////////////////////  hour devices routes //////////////////// 
+////////////////////  hour devices routes ////////////////////
 router.get('/temperature', (req,res) => {
     //gets only telemetry associated to the device
-    Telemetry.find({
-      device: 'temperature',
+    Temperature.find({
       date:{$gt:new Date(Date.now() - 60*60 * 1000)}    //restricted to the last hour
     })
       .sort({date:'desc'})
@@ -30,8 +36,7 @@ router.get('/temperature', (req,res) => {
 })
 
 router.get('/humidity', (req,res) => {
-  Telemetry.find({
-    device: 'humidity',
+  Humidity.find({
     date:{$gt:new Date(Date.now() - 60*60 * 1000)}
   })
     .sort({date:'desc'})
@@ -44,8 +49,7 @@ router.get('/humidity', (req,res) => {
 })
 
 router.get('/direction', (req,res) => {
-  Telemetry.find({
-    device: 'direction',
+  Direction.find({
     date:{$gt:new Date(Date.now() - 60*60 * 1000)}
   })
     .sort({date:'desc'})
@@ -58,8 +62,7 @@ router.get('/direction', (req,res) => {
 })
 
 router.get('/intensity', (req,res) => {
-  Telemetry.find({
-    device: 'intensity',
+  Intensity.find({
     date:{$gt:new Date(Date.now() - 60*60 * 1000)}
   })
     .sort({date:'desc'})
@@ -72,8 +75,7 @@ router.get('/intensity', (req,res) => {
 })
 
 router.get('/height', (req,res) => {
-  Telemetry.find({
-    device: 'height',
+  Height.find({
     date:{$gt:new Date(Date.now() - 60*60 * 1000)}
   })
     .sort({date:'desc'})
@@ -91,8 +93,7 @@ router.get('/height', (req,res) => {
 //////////////////// everything devices routes ////////////////////
 router.get('/temptotal', (req,res) => {
     //gets only telemetry associated to the device
-    Telemetry.find({
-      device: 'temperature'
+    Temperature.find({
     })
       .sort({date:'desc'})
       .then(metrics => {
@@ -104,8 +105,7 @@ router.get('/temptotal', (req,res) => {
 })
 
 router.get('/humtotal', (req,res) => {
-  Telemetry.find({
-    device: 'humidity',
+  Humidity.find({
   })
     .sort({date:'desc'})
     .then(metrics => {
@@ -117,8 +117,7 @@ router.get('/humtotal', (req,res) => {
 })
 
 router.get('/dirtotal', (req,res) => {
-  Telemetry.find({
-    device: 'direction',
+  Direction.find({
   })
     .sort({date:'desc'})
     .then(metrics => {
@@ -130,8 +129,7 @@ router.get('/dirtotal', (req,res) => {
 })
 
 router.get('/inttotal', (req,res) => {
-  Telemetry.find({
-    device: 'intensity',
+  Intensity.find({
   })
     .sort({date:'desc'})
     .then(metrics => {
@@ -143,8 +141,7 @@ router.get('/inttotal', (req,res) => {
 })
 
 router.get('/heitotal', (req,res) => {
-  Telemetry.find({
-    device: 'height',
+  Height.find({
   })
     .sort({date:'desc'})
     .then(metrics => {

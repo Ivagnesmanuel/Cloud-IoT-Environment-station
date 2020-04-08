@@ -29,10 +29,17 @@ mongoose.connect(keys.mongoURI, {
   .then(() => console.log('MongoDb Connected'))      //use promise instead of callbacks for cleaner code
   .catch(err => console.log(err));
 
-//load model
-require('./models/Telemetry');
-const Telemetry = mongoose.model('telemetries');
-
+//load models
+require('./models/Temperature');
+require('./models/Humidity');
+require('./models/Direction');
+require('./models/Intensity');
+require('./models/Height');
+const Temperature = mongoose.model('temperatureValues');
+const Humidity = mongoose.model('humidityValues');
+const Direction = mongoose.model('directionValues');
+const Intensity = mongoose.model('intensityValues');
+const Height = mongoose.model('heightValues');
 
 
 //////////////////// websocket + google code for MQTT Asynchronous Pull ////////////////////
@@ -53,34 +60,44 @@ io.on('connection', function (socket) {
         console.log(`\tData: ${message.data}`);
         var payload = `${message.data}`.split(" ");
 
-        // needed for the interactive home page
-        if(payload[0] == "temperature")                       //recognition by deviceID
-          io.emit("temperature", payload[1]+" "+payload[2]);  //value time
-
-        if(payload[0] == "humidity")
-          io.emit("humidity", payload[1]+" "+payload[2]);
-
-        if(payload[0] == "direction")
-          io.emit("direction", payload[1]+" "+payload[2]);
-
-        if(payload[0] == "intensity")
-          io.emit("intensity", payload[1]+" "+payload[2]);
-
-        if(payload[0] == "height")
-          io.emit("height", payload[1]+" "+payload[2]);
-
-        // "Ack" (acknowledge receipt of) the message
-        message.ack();
-
         // create the new Telemetry object
         const newTelemetry = {
-          device: payload[0],
           value: payload[1],
           date: payload[2]
         }
 
-        // save the new telemetry inside the database
-        new Telemetry(newTelemetry).save();
+        // needed for the interactive home page
+        if(payload[0] == "temperature"){                       //recognition by deviceID
+          io.emit("temperature", payload[1]+" "+payload[2]);  //value time
+          new Temperature(newTelemetry).save();
+        }
+
+        if(payload[0] == "humidity"){
+          io.emit("humidity", payload[1]+" "+payload[2]);
+          new Humidity(newTelemetry).save();
+        }
+
+
+        if(payload[0] == "direction"){
+          io.emit("direction", payload[1]+" "+payload[2]);
+          new Direction(newTelemetry).save();
+        }
+
+
+        if(payload[0] == "intensity"){
+          io.emit("intensity", payload[1]+" "+payload[2]);
+          new Intensity(newTelemetry).save();
+        }
+
+
+        if(payload[0] == "height"){
+          io.emit("height", payload[1]+" "+payload[2]);
+          new Height(newTelemetry).save();
+        }
+
+
+        // "Ack" (acknowledge receipt of) the message
+        message.ack();
       };
 
       // Listen for new messages until timeout is hit
