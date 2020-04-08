@@ -35,7 +35,7 @@ const Telemetry = mongoose.model('telemetries');
 
 
 
-//  websocket + google code for MQTT Asynchronous Pull
+//////////////////// websocket + google code for MQTT Asynchronous Pull ////////////////////
 io.on('connection', function (socket) {
   //console.log(`websocket started`);
   // Creates a client; cache this for further use
@@ -53,8 +53,8 @@ io.on('connection', function (socket) {
         console.log(`\tData: ${message.data}`);
         var payload = `${message.data}`.split(" ");
 
-        //needed for the interactive home page
-        if(payload[0] == "temperature")                      //recognition by deviceID
+        // needed for the interactive home page
+        if(payload[0] == "temperature")                       //recognition by deviceID
           io.emit("temperature", payload[1]+" "+payload[2]);  //value time
 
         if(payload[0] == "humidity")
@@ -72,23 +72,20 @@ io.on('connection', function (socket) {
         // "Ack" (acknowledge receipt of) the message
         message.ack();
 
-        //create the new Telemetry object
+        // create the new Telemetry object
         const newTelemetry = {
           device: payload[0],
           value: payload[1],
           date: payload[2]
         }
 
-        new Telemetry(newTelemetry)
-          .save()
-          .then(event => {
-          res.redirect('/')
-        }).catch(err => console.log('Asynchronous save'));
-
+        // save the new telemetry inside the database
+        new Telemetry(newTelemetry).save();
       };
 
       // Listen for new messages until timeout is hit
       subscription.on('message', messageHandler);
+
     } catch(err) {
       console.log(err)
     }

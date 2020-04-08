@@ -2,6 +2,9 @@ import uuid, jwt, ssl, random, os, logging, datetime, argparse
 import paho.mqtt.client as mqtt
 import MQTTSN, socket, time, MQTTSNinternal, thread, types, sys, struct
 
+global minimum_backoff_time
+global MAXIMUM_BACKOFF_TIME
+
 # SETUP
 project_id = 'iot-assign1'
 registry_id = 'my-registry'
@@ -18,7 +21,6 @@ mqtt_bridge_port = 443
 
 print('****************** Gateway actived ******************');
 
-
 ################################################# Devices code ########################################################################
 class Callback:
 
@@ -27,20 +29,20 @@ class Callback:
     self.registered = {}
 
   def connectionLost(self, cause):
-    print("default connectionLost", cause)
+    print "default connectionLost", cause 
     self.events.append("disconnected")
 
 #function modified to directly forward messages from devices to google
   def messageArrived(self, topicName, payload, qos, retained, msgid):
-    print("Recived data from device:", payload)
-    Gclient.publish(mqtt_topic, payload, qos=0)
+    print "Recived data from device:", payload				
+    google_client.publish(mqtt_topic, payload, qos=0)
     return True
 
   def deliveryComplete(self, msgid):
-    print("default deliveryComplete")
+    print "default deliveryComplete" 
 
   def advertise(self, address, gwid, duration):
-    print("advertise", address, gwid, duration)
+    print "advertise", address, gwid, duration 
 
   def register(self, topicid, topicName):
     self.registered[topicId] = topicName
@@ -246,7 +248,7 @@ def error_str(rc):
 
 def on_connect(unused_client, unused_userdata, unused_flags, rc):
     """Callback for when a device connects."""
-    print('on_connect', mqtt.connack_string(rc))
+    print'on_connect', mqtt.connack_string(rc)
 
     # After a successful connect, reset backoff time and stop backing off.
     global should_backoff
@@ -257,7 +259,7 @@ def on_connect(unused_client, unused_userdata, unused_flags, rc):
 
 def on_disconnect(unused_client, unused_userdata, rc):
     """Paho callback for when a device disconnects."""
-    print('on_disconnect', error_str(rc))
+    print'on_disconnect', error_str(rc)
 
     # Since a disconnect occurred, the next loop iteration will wait with
     # exponential backoff.
@@ -267,7 +269,7 @@ def on_disconnect(unused_client, unused_userdata, rc):
 
 def on_publish(unused_client, unused_userdata, unused_mid):
     """Paho callback when a message is sent to the broker."""
-    print('publishing data to google')
+    print'publishing data to google'
 
 
 def on_message(unused_client, unused_userdata, message):
@@ -323,33 +325,64 @@ def get_client(
 
     return client
 
-#######################################################################################################################################
-
 
 
 if __name__ == "__main__":
 
+
+ 
 	#client connetted to devices
 	gate = Client("linh", port=1885)
 	gate.registerCallback(Callback())
 	gate.connect()
-
+	
 	rc, topic1 = gate.subscribe("telemetry")
-
-
+	
+	
 	#client to connect to google cloud
 	jwt_iat = datetime.datetime.utcnow()
-	Gclient = get_client( project_id, cloud_region, registry_id,
+	jwt_exp_mins = 20
+	google_client = get_client( project_id, cloud_region, registry_id,
 						device_id, rsa_private_path, algorithm,
 						ca_cert_path, mqtt_bridge_hostname, mqtt_bridge_port)
-
+	
 	mqtt_topic = '/devices/{}/{}'.format(device_id, sub_topic)
-
-
+	
+	
 	try:
 		while True:
 			time.sleep(1)
+			google_client.loop()
+			
+			if should_backoff:
+				# If backoff time is too large, give up.
+				if minimum_backoff_time > MAXIMUM_BACKOFF_TIME:
+					print('Exceeded maximum backoff time. Giving up.')
+            				break
 
+        			# Otherwise, wait and connect again.
+        			delay = minimum_backoff_time + random.randint(0, 1000) / 1000.0
+        			print('Waiting for {} before reconnecting.'.format(delay))
+        			time.sleep(delay)
+        			minimum_backoff_time *= 2
+        			google_client.connect(mqtt_bridge_hostname, mqtt_bridge_port)
+        		
+        		seconds_since_issue = (datetime.datetime.utcnow() - jwt_iat).seconds
+    			if seconds_since_issue > 60 * jwt_exp_mins:
+				print('Refreshing token after {}s'.format(seconds_since_issue))
+        			jwt_iat = datetime.datetime.utcnow()
+        			google_client.loop()
+        			google_client.disconnect()
+        			google_client = get_client(project_id, cloud_region, registry_id,
+						device_id, rsa_private_path, algorithm,
+						ca_cert_path, mqtt_bridge_hostname, mqtt_bridge_port)
+
+
+	
 	except KeyboardInterrupt:
-		aclient.unsubscribe("telemetry")
-		aclient.disconnect()
+		gate.unsubscribe("telemetry")
+		gate.disconnect()
+		google_client.disconnect()
+	
+
+

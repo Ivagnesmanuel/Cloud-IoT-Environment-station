@@ -13,7 +13,7 @@ router.get('/', (req,res) => {
 })
 
 
-//hour devices routes
+////////////////////  hour devices routes //////////////////// 
 router.get('/temperature', (req,res) => {
     //gets only telemetry associated to the device
     Telemetry.find({
@@ -88,7 +88,7 @@ router.get('/height', (req,res) => {
 
 
 
-//everything devices routes
+//////////////////// everything devices routes ////////////////////
 router.get('/temptotal', (req,res) => {
     //gets only telemetry associated to the device
     Telemetry.find({

@@ -1,4 +1,4 @@
-# IOT environmental station
+# IOT environment station
 
 This project has been made for the "Internet of Things" course at "La Sapienza University of Rome". The goal is to build a cloud-based IoT system that collects information from a set of environmental sensors using the MQTT protocol, which is controlled by a Google cloud IoT platform backend, implementing the Core-IoT and Pub/Sub API.
 To visualize the results, I have also implemented a dashboard, showing the current values, the last hour values and finally all the values collected by the application.
