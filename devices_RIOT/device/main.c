@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
 #include "shell.h"
@@ -182,8 +181,9 @@ static int cmd_infinite(int argc, char **argv)
     unsigned flags = EMCUTE_QOS_0;
     char* payload;
 
-    if (argc < 2) {
-        printf("please insert interval\n");
+    if (argc < 3) {
+        printf("Missing values, correct usage: start [interval] [telemetries to send separated by space]\n");
+        printf(" possible values for telemetries:\n	temperature\n	humidity\n	wind_direction\n	wind_intensity\n	rain_height\n");
         return 1;
     }
 
@@ -197,40 +197,42 @@ static int cmd_infinite(int argc, char **argv)
 
     while(1){
   		//send temperature value
-      payload = gen_payload("temperature", -50, 50);
-    	if (emcute_pub(&t, payload, strlen(payload), flags) != EMCUTE_OK) {
-        	printf("error: unable to publish data to topic '%s [%i]'\n",
-                t.name, (int)t.id);
-        	return 1;
-    	}
-    	printf("Published to topic %s the payload: [ %s ]\n", t.name, (char*) payload);
-    	xtimer_sleep(1);
 
-    	//send humidity value
-    	payload = gen_payload("humidity", 0, 100);
-    	if (emcute_pub(&t, payload, strlen(payload), flags) != EMCUTE_OK) {
-        	printf("error: unable to publish data to topic '%s [%i]'\n",
-                t.name, (int)t.id);
-        	return 1;
-    	}
-    	printf("Published to topic %s the payload: [ %s ]\n", t.name, (char*) payload);
-    	xtimer_sleep(1);
+	    int i;
+   		for (i=2; i<argc; i++){
+   			if (strcmp(argv[i],"temperature") == 0)
+   				payload = gen_payload("temperature", -50, 50);
 
-    	//send rain value
-    	payload = gen_payload("height", 0, 50);
-    	if (emcute_pub(&t, payload, strlen(payload), flags) != EMCUTE_OK) {
-        	printf("error: unable to publish data to topic '%s [%i]'\n",
-                t.name, (int)t.id);
-        	return 1;
-    	}
-    	printf("Published to topic %s the payload: [ %s ]\n", t.name, (char*) payload);
+   			else if (strcmp(argv[i],"humidity") == 0)
+   				payload = gen_payload("humidity", 0, 100);
+
+   			else if (strcmp(argv[i],"wind_direction") == 0)
+   				payload = gen_payload("direction", 0, 50);
+
+   			else if (strcmp(argv[i],"wind_intensity") == 0)
+   				payload = gen_payload("intensity", 0, 50);
+
+   			else if (strcmp(argv[i],"rain_height") == 0)
+   				payload = gen_payload("height", 0, 50);
 
 
+   			if (emcute_pub(&t, payload, strlen(payload), flags) != EMCUTE_OK) {
+        		printf("error: unable to publish data to topic '%s [%i]'\n",
+                	t.name, (int)t.id);
+        		return 1;
+    		}
+    		printf("Published to topic %s the payload: [ %s ]\n", t.name, (char*) payload);
+
+    		xtimer_sleep(1);
+   		}
+
+      free(payload);
     	xtimer_sleep(interval);
+
     }
 
 	free(payload);
-    return 0;
+  return 0;
 }
 //**********************************************************************
 
