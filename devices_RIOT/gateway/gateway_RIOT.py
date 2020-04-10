@@ -29,20 +29,20 @@ class Callback:
     self.registered = {}
 
   def connectionLost(self, cause):
-    print "default connectionLost", cause 
+    print "default connectionLost", cause
     self.events.append("disconnected")
 
 #function modified to directly forward messages from devices to google
   def messageArrived(self, topicName, payload, qos, retained, msgid):
-    print "Recived data from device:", payload				
+    print "Recived data from device:", payload
     google_client.publish(mqtt_topic, payload, qos=0)
     return True
 
   def deliveryComplete(self, msgid):
-    print "default deliveryComplete" 
+    print "default deliveryComplete"
 
   def advertise(self, address, gwid, duration):
-    print "advertise", address, gwid, duration 
+    print "advertise", address, gwid, duration
 
   def register(self, topicid, topicName):
     self.registered[topicId] = topicName
@@ -329,31 +329,29 @@ def get_client(
 
 if __name__ == "__main__":
 
-
- 
 	#client connetted to devices
 	gate = Client("linh", port=1885)
 	gate.registerCallback(Callback())
 	gate.connect()
-	
+
 	rc, topic1 = gate.subscribe("telemetry")
-	
-	
+
+
 	#client to connect to google cloud
 	jwt_iat = datetime.datetime.utcnow()
 	jwt_exp_mins = 20
 	google_client = get_client( project_id, cloud_region, registry_id,
 						device_id, rsa_private_path, algorithm,
 						ca_cert_path, mqtt_bridge_hostname, mqtt_bridge_port)
-	
+
 	mqtt_topic = '/devices/{}/{}'.format(device_id, sub_topic)
-	
-	
+
+
 	try:
 		while True:
 			time.sleep(1)
 			google_client.loop()
-			
+
 			if should_backoff:
 				# If backoff time is too large, give up.
 				if minimum_backoff_time > MAXIMUM_BACKOFF_TIME:
@@ -366,7 +364,7 @@ if __name__ == "__main__":
         			time.sleep(delay)
         			minimum_backoff_time *= 2
         			google_client.connect(mqtt_bridge_hostname, mqtt_bridge_port)
-        		
+
         		seconds_since_issue = (datetime.datetime.utcnow() - jwt_iat).seconds
     			if seconds_since_issue > 60 * jwt_exp_mins:
 				print('Refreshing token after {}s'.format(seconds_since_issue))
@@ -378,11 +376,7 @@ if __name__ == "__main__":
 						ca_cert_path, mqtt_bridge_hostname, mqtt_bridge_port)
 
 
-	
 	except KeyboardInterrupt:
 		gate.unsubscribe("telemetry")
 		gate.disconnect()
 		google_client.disconnect()
-	
-
-

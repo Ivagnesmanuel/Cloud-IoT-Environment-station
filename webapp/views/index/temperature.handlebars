@@ -1,17 +1,66 @@
 <div class="jumbotron text-center">
     <h1> Temperature &nbsp;<i class="fa fa-thermometer-half"></i></h1>
 
+    <div class="container">
+      <canvas id="myChart" width="500" height="230"></canvas>
+    </div><br>
+
     {{#each metrics}}
       <div class="card card-body mb-2">
         <p><b>Date:</b> {{formatDate date 'MMMM Do YYYY'}}  &nbsp; <b>Time:</b> {{formatDate date 'HH:mm:ss'}}</p>
         <h6 align="center">{{value}} °C</h6>
       </div>
     {{else}}
-        <p>No metrics found for the last hour</p>
+        <p>No metrics found</p>
     {{/each}}
 
     {{#if total}}
-      <a class="btn btn-secondary" href="/temptotal" role="button"> &nbsp; &nbsp; See everything &nbsp; &nbsp;</a>
+      <br>
+      <a class="btn btn-secondary" href="/temptotal" role="button"> &nbsp; &nbsp; Try to see old data &nbsp; &nbsp;</a>
     {{/if}}
 
+
+
 </div><br><br><br>
+
+<!-- to use chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js "></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+  const socket = io('/tempView');
+  const ctx = document.getElementById('myChart').getContext('2d');
+
+  const myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+          labels: [],
+          datasets: [{
+              label: 'Temperature in °C',
+              data: [],
+              backgroundColor: 'rgba(255, 203, 5, 0.1',
+              borderColor: 'rgba(232, 126, 4, 1)',
+              borderWidth: 2
+          }]
+      },
+      options: {
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true
+                  }
+              }]
+          }
+      }
+  });
+
+  socket.on('temperatureTele', function(data){
+    data.forEach( tele => {
+      myChart.data.datasets[0].data.push(parseInt(tele.value))
+      myChart.data.labels.push(parseInt(tele.date)/1000)
+    });
+    myChart.update();
+  });
+
+</script>

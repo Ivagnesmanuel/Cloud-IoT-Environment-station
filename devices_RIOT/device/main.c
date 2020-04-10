@@ -175,6 +175,7 @@ static int cmd_pub(int argc, char **argv)
 
 //**********************************************************************
 // function added to implement the autonomus perdiodic value sending
+
 static int cmd_infinite(int argc, char **argv)
 {
     emcute_topic_t t;
@@ -182,12 +183,12 @@ static int cmd_infinite(int argc, char **argv)
     char* payload;
 
     if (argc < 3) {
-        printf("Missing values, correct usage: start [interval] [telemetries to send separated by space]\n");
-        printf(" possible values for telemetries:\n	temperature\n	humidity\n	wind_direction\n	wind_intensity\n	rain_height\n");
+        puts("Missing values, correct usage: start [interval] [telemetries to send separated by space]\n\n");
+        puts("The possible values for telemetries are:\n	temperature\n	humidity\n	wind_direction\n	wind_intensity\n	rain_height\n\n");
         return 1;
     }
 
-   int interval = atoi(argv[1]);
+    short interval = atoi(argv[1]);
     t.name = "telemetry";
     if (emcute_reg(&t) != EMCUTE_OK) {
         puts("error: unable to obtain topic ID");
@@ -198,7 +199,7 @@ static int cmd_infinite(int argc, char **argv)
     while(1){
   		//send temperature value
 
-	    int i;
+	    short i;
    		for (i=2; i<argc; i++){
    			if (strcmp(argv[i],"temperature") == 0)
    				payload = gen_payload("temperature", -50, 50);
@@ -207,10 +208,10 @@ static int cmd_infinite(int argc, char **argv)
    				payload = gen_payload("humidity", 0, 100);
 
    			else if (strcmp(argv[i],"wind_direction") == 0)
-   				payload = gen_payload("direction", 0, 50);
+   				payload = gen_payload("direction", 0, 360);
 
    			else if (strcmp(argv[i],"wind_intensity") == 0)
-   				payload = gen_payload("intensity", 0, 50);
+   				payload = gen_payload("intensity", 0, 100);
 
    			else if (strcmp(argv[i],"rain_height") == 0)
    				payload = gen_payload("height", 0, 50);
@@ -223,15 +224,15 @@ static int cmd_infinite(int argc, char **argv)
     		}
     		printf("Published to topic %s the payload: [ %s ]\n", t.name, (char*) payload);
 
+			  free(payload);
     		xtimer_sleep(1);
    		}
 
-      free(payload);
-    	xtimer_sleep(interval);
+
+      xtimer_sleep(interval);
 
     }
 
-	free(payload);
   return 0;
 }
 //**********************************************************************

@@ -1,17 +1,65 @@
 <div class="jumbotron text-center">
-    <h1> Rain height  &nbsp; <i class="fas fa-cloud-rain"></i></h1>
+  <h1> Rain height  &nbsp; <i class="fas fa-cloud-rain"></i></h1>
 
-    {{#each metrics}}
-      <div class="card card-body mb-2">
-        <p><b>Date:</b> {{formatDate date 'MMMM Do YYYY'}}  &nbsp; <b>Time:</b> {{formatDate date 'HH:mm:ss'}}</p>
-        <h6 align="center">{{value}} mm/h</h6>
-      </div>
-      {{else}}
-          <p>No metrics found for the last hour</p>
-      {{/each}}
+  <div class="container">
+    <canvas id="myChart" width="500" height="230"></canvas>
+  </div><br>
 
-      {{#if total}}
-        <a class="btn btn-secondary" href="/heitotal" role="button"> &nbsp; &nbsp; See everything &nbsp; &nbsp;</a>
-      {{/if}}
+  {{#each metrics}}
+    <div class="card card-body mb-2">
+      <p><b>Date:</b> {{formatDate date 'MMMM Do YYYY'}}  &nbsp; <b>Time:</b> {{formatDate date 'HH:mm:ss'}}</p>
+      <h6 align="center">{{value}} mm/h</h6>
+    </div>
+  {{else}}
+      <p>No metrics found for the last hour</p>
+  {{/each}}
 
-  </div><br><br><br>
+  {{#if total}}
+      <br>
+      <a class="btn btn-secondary" href="/heitotal" role="button"> &nbsp; &nbsp; See everything &nbsp; &nbsp;</a>
+  {{/if}}
+
+</div><br><br><br>
+
+<!-- to use chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js "></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+  const socket = io('/rainView');
+  const ctx = document.getElementById('myChart').getContext('2d');
+
+  const myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+          labels: [],
+          datasets: [{
+              label: 'Rain height in mm/h',
+              data: [],
+              backgroundColor: 'rgba(89, 171, 227, 0.1)',
+              borderColor: 'rgba(34, 167, 240, 1)',
+              borderWidth: 2
+          }]
+      },
+      options: {
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true
+                  }
+              }]
+          }
+      }
+  });
+
+
+  socket.on('rainTele', function(data){
+    data.forEach( tele => {
+      myChart.data.datasets[0].data.push(parseInt(tele.value))
+      myChart.data.labels.push(" ")
+    });
+    myChart.update();
+  });
+
+</script>

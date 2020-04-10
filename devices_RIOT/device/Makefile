@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = device1
+APPLICATION = device_RIOT
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
