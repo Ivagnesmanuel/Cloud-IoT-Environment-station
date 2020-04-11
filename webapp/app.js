@@ -60,50 +60,51 @@ function listenForMessages() {
         {deviceId:deviceId}
       ).then(device =>{
 
+          // if it is a new device, create the new device object
           if (!device){
-            //create the new event object
             const newDevice = {
               deviceId:deviceId
             }
+            new Device(newDevice).save()
 
-            new Device(newDevice).save();
-          }
+          } else {
 
-          // create the new Telemetry object
+          // create directly the new Telemetry object
           const newTelemetry = {
-            deviceId:device,
-            value: payload[1],
-            date: payload[2]
-          }
+              deviceId:device._id,
+              value: payload[1],
+              date: payload[2]
+            }
 
-          // needed for the interactive home page
+          // emit and save the new telemetry
           if(payload[0] == "temperature"){                      //recognition by deviceID
-            io.emit("temperature", payload[1]+" "+payload[2]);  //value time
+            io.emit("temperature", deviceId+" "+payload[1]);  //value time
             new Temperature(newTelemetry).save();
           }
 
           if(payload[0] == "humidity"){
-            io.emit("humidity", payload[1]+" "+payload[2]);
+            io.emit("humidity", deviceId+" "+payload[1]);
             new Humidity(newTelemetry).save();
           }
 
 
           if(payload[0] == "direction"){
-            io.emit("direction", payload[1]+" "+payload[2]);
+            io.emit("direction", deviceId+" "+payload[1]);
             new Direction(newTelemetry).save();
           }
 
 
           if(payload[0] == "intensity"){
-            io.emit("intensity", payload[1]+" "+payload[2]);
+            io.emit("intensity", deviceId+" "+payload[1]);
             new Intensity(newTelemetry).save();
           }
 
 
           if(payload[0] == "height"){
-            io.emit("height", payload[1]+" "+payload[2]);
+            io.emit("height", deviceId+" "+payload[1]);
             new Height(newTelemetry).save();
           }
+        }
 
       });
 
@@ -125,9 +126,10 @@ listenForMessages();
 //////////////////// socket.io functions to retrive data for charts ////////////////////
 const temp = io.of('/tempView');
 temp.on('connection', function(socket){
-  const values = Temperature.find(
-    {date:{$gt:new Date(Date.now() - 60*60 * 1000)}}
-  ).sort({date:'asc'}).then(values => {
+  const values = Temperature.find({
+    date:{$gt:new Date(Date.now() - 60*60 * 1000)},
+    deviceId:socket.handshake.query.url
+  }).sort({date:'asc'}).then(values => {
     temp.emit("temperatureTele", values)
   })
 });
@@ -135,9 +137,10 @@ temp.on('connection', function(socket){
 
 const hum = io.of('/humView');
 hum.on('connection', function(socket){
-  const values = Humidity.find(
-    {date:{$gt:new Date(Date.now() - 60*60 * 1000)}}
-  ).sort({date:'asc'}).then(values => {
+  const values = Humidity.find({
+    date:{$gt:new Date(Date.now() - 60*60 * 1000)},
+    deviceId:socket.handshake.query.url
+  }).sort({date:'asc'}).then(values => {
     hum.emit("humidityTele", values)
   })
 });
@@ -145,9 +148,10 @@ hum.on('connection', function(socket){
 
 const dire = io.of('/direView');
 dire.on('connection', function(socket){
-  const values = Direction.find(
-    {date:{$gt:new Date(Date.now() - 60*60 * 1000)}}
-  ).sort({date:'asc'}).then(values => {
+  const values = Direction.find({
+    date:{$gt:new Date(Date.now() - 60*60 * 1000)},
+    deviceId:socket.handshake.query.url
+  }).sort({date:'asc'}).then(values => {
     dire.emit("directionTele", values)
   })
 });
@@ -155,9 +159,10 @@ dire.on('connection', function(socket){
 
 const inte = io.of('/inteView');
 inte.on('connection', function(socket){
-  const values = Intensity.find(
-    {date:{$gt:new Date(Date.now() - 60*60 * 1000)}}
-  ).sort({date:'asc'}).then(values => {
+  const values = Intensity.find({
+    date:{$gt:new Date(Date.now() - 60*60 * 1000)},
+    deviceId:socket.handshake.query.url
+  }).sort({date:'asc'}).then(values => {
     inte.emit("intensityTele", values)
   })
 });
@@ -165,9 +170,10 @@ inte.on('connection', function(socket){
 
 const rain = io.of('/rainView');
 rain.on('connection', function(socket){
-  const values = Height.find(
-    {date:{$gt:new Date(Date.now() - 60*60 * 1000)}}
-  ).sort({date:'asc'}).then(values => {
+  const values = Height.find({
+    date:{$gt:new Date(Date.now() - 60*60 * 1000)},
+    deviceId:socket.handshake.query.url
+  }).sort({date:'asc'}).then(values => {
     rain.emit("rainTele", values)
   })
 });

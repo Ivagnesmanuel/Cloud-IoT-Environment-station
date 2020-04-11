@@ -54,7 +54,7 @@ const publishAsync = (
     const payload = "virtual:"+" "+deviceId+" "+intensity+" "+date;
 
     // Publish "payload" to the MQTT topic. qos=1 means at least once delivery.
-    console.log('Publishing message:', payload);
+    console.log('Publishing message  => ', payload);
     client.publish(mqttTopic, payload, {qos: 1});
 
     publishAsync(mqttTopic, client, iatTime, 1, connectionArgs);

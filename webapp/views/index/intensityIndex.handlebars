@@ -1,0 +1,14 @@
+<div class="jumbotron text-center">
+    <h1> Wind intensity sensors &nbsp;<i class="fa fa-thermometer-half"></i></h1><br>
+
+    {{#each devices}}
+      <div class="card card-body mb-2">
+        <h5 align="center">{{deviceId}}</h5>
+        <a href="/intensity/{{id}}" class="btn btn-dark btn-block mb-2">Read more details</a>
+      </div>
+    {{else}}
+        <p>No devices found</p>
+    {{/each}}
+
+
+</div><br><br>

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 //create Schema
 const HumiditySchema = new Schema({
   deviceId:{
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
     ref:'devices'
   },

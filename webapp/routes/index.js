@@ -22,136 +22,158 @@ router.get('/', (req,res) => {
     res.render('index/home');
 })
 
-////////////////////  hour devices routes ////////////////////
-router.get('/temperature', (req,res) => {
+
+//////////////////// devices telemetry indexs ////////////////////
+router.get('/temperatureIndex', (req,res) => {
     //gets only telemetry associated to the device
-    Temperature.find({
-      date:{$gt:new Date(Date.now() - 60*60 * 1000)}    //restricted to the last hour
-    })
-      .sort({date:'desc'})
-      .then(metrics => {
-        res.render('index/temperature', {
-          metrics:metrics,
-          total:true
+    Device.find({}).then(devices => {
+        res.render('index/temperatureIndex', {
+          devices:devices,
     });
   });
 })
 
-router.get('/humidity', (req,res) => {
-  Humidity.find({
-    date:{$gt:new Date(Date.now() - 60*60 * 1000)}
-  })
-    .sort({date:'desc'})
-    .then(metrics => {
-      res.render('index/humidity', {
-        metrics:metrics,
-        total:true
-  });
-});
-})
 
-router.get('/direction', (req,res) => {
-  Direction.find({
-    date:{$gt:new Date(Date.now() - 60*60 * 1000)}
-  })
-    .sort({date:'desc'})
-    .then(metrics => {
-      res.render('index/direction', {
-        metrics:metrics,
-        total:true
-  });
-});
-})
-
-router.get('/intensity', (req,res) => {
-  Intensity.find({
-    date:{$gt:new Date(Date.now() - 60*60 * 1000)}
-  })
-    .sort({date:'desc'})
-    .then(metrics => {
-      res.render('index/intensity', {
-        metrics:metrics,
-        total:true
-  });
-});
-})
-
-router.get('/height', (req,res) => {
-  Height.find({
-    date:{$gt:new Date(Date.now() - 60*60 * 1000)}
-  })
-    .sort({date:'desc'})
-    .then(metrics => {
-      res.render('index/height', {
-        metrics:metrics,
-        total:true
-  });
-});
-})
-
-
-
-
-//////////////////// everything devices routes ////////////////////
-router.get('/temptotal', (req,res) => {
+router.get('/humidityIndex', (req,res) => {
     //gets only telemetry associated to the device
-    Temperature.find({
-    })
-      .sort({date:'desc'})
-      .then(metrics => {
-        res.render('index/temperature', {
-          metrics:metrics,
-          total:false
+    Device.find({}).then(devices => {
+        res.render('index/humidityIndex', {
+          devices:devices,
     });
   });
 })
 
-router.get('/humtotal', (req,res) => {
+
+router.get('/directionIndex', (req,res) => {
+    //gets only telemetry associated to the device
+    Device.find({}).then(devices => {
+        res.render('index/directionIndex', {
+          devices:devices,
+    });
+  });
+})
+
+
+router.get('/intensityIndex', (req,res) => {
+    //gets only telemetry associated to the device
+    Device.find({}).then(devices => {
+        res.render('index/intensityIndex', {
+          devices:devices,
+    });
+  });
+})
+
+
+router.get('/heightIndex', (req,res) => {
+    //gets only telemetry associated to the device
+    Device.find({}).then(devices => {
+        res.render('index/heightIndex', {
+          devices:devices,
+    });
+  });
+})
+
+
+
+
+//////////////////// single device telemetry routes ////////////////////
+router.get('/temperature/:id', (req,res) => {
+    //gets only telemetry associated to the device
+    Temperature.find({
+      deviceId:req.params.id
+    })
+    .sort({date:'desc'})
+    .then(metrics => {
+
+      Device.findOne({
+         _id:req.params.id
+      }).then(device => {
+
+        res.render('index/temperature', {
+          metrics:metrics,
+          device:device.deviceId
+        })
+      });
+    });
+})
+
+
+
+router.get('/humidity/:id', (req,res) => {
   Humidity.find({
+    deviceId: req.params.id
   })
     .sort({date:'desc'})
     .then(metrics => {
-      res.render('index/humidity', {
-        metrics:metrics,
-        total:false
-  });
-});
+
+      Device.findOne({
+         _id:req.params.id
+      }).then(device => {
+
+        res.render('index/humidity', {
+          metrics:metrics,
+          device:device.deviceId
+        })
+      });
+    });
 })
 
-router.get('/dirtotal', (req,res) => {
+router.get('/direction/:id', (req,res) => {
   Direction.find({
+    deviceId: req.params.id
   })
     .sort({date:'desc'})
     .then(metrics => {
-      res.render('index/direction', {
-        metrics:metrics,
-        total:false
-  });
-});
+
+      Device.findOne({
+         _id:req.params.id
+      }).then(device => {
+
+        res.render('index/direction', {
+          metrics:metrics,
+          device:device.deviceId
+        })
+      });
+    });
+
 })
 
-router.get('/inttotal', (req,res) => {
+router.get('/intensity/:id', (req,res) => {
   Intensity.find({
+    deviceId: req.params.id
   })
     .sort({date:'desc'})
     .then(metrics => {
-      res.render('index/intensity', {
-        metrics:metrics,
-        total:false
-  });
-});
+
+      Device.findOne({
+         _id:req.params.id
+      }).then(device => {
+
+        res.render('index/intensity', {
+          metrics:metrics,
+          device:device.deviceId
+        })
+      });
+    });
 })
 
-router.get('/heitotal', (req,res) => {
+router.get('/height/:id', (req,res) => {
   Height.find({
+      deviceId: req.params.id,
   })
     .sort({date:'desc'})
     .then(metrics => {
-      res.render('index/height', {
-        metrics:metrics,
-        total:false
-  });
-});
+
+      Device.findOne({
+         _id:req.params.id
+      }).then(device => {
+
+        res.render('index/height', {
+          metrics:metrics,
+          device:device.deviceId
+        })
+      });
+    });
 })
 
 

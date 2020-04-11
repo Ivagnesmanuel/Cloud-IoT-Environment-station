@@ -1,5 +1,5 @@
 <div class="jumbotron text-center">
-  <h1> Wind intensity  &nbsp; <i class="fa fa-wind"></i> </h1>
+  <h1> {{device}} wind intensity sensor &nbsp; <i class="fa fa-wind"></i> </h1>
 
   <div class="container">
     <canvas id="myChart" width="500" height="200"></canvas>
@@ -27,7 +27,9 @@
 
 <script>
 
-  const socket = io('/inteView');
+  const url = window.location.pathname;
+  const id = url.substring(url.lastIndexOf('/') + 1)
+  const socket = io('/inteView', {query:"url="+id});
   const ctx = document.getElementById('myChart').getContext('2d');
 
   const myChart = new Chart(ctx, {
@@ -54,12 +56,25 @@
   });
 
 
+  function pad(num) {
+    return ("0"+num).slice(-2);
+  }
+
+  function getTimeFromDate(timestamp) {
+    var date = new Date(timestamp);
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var seconds = date.getSeconds();
+    return pad(hours)+":"+pad(minutes)+":"+pad(seconds)
+  }
+
   socket.on('intensityTele', function(data){
     data.forEach( tele => {
       myChart.data.datasets[0].data.push(parseInt(tele.value))
-      myChart.data.labels.push(" ")
+      myChart.data.labels.push(getTimeFromDate(tele.date))
     });
     myChart.update();
   });
+
 
 </script>

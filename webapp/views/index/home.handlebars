@@ -2,7 +2,7 @@
 <div class="jumbotron text-center" id="box">
 
     <div class="card card-body mb-2">
-      <h2 align="center">Temperature &nbsp; <i class="fa fa-thermometer-half"></i>  </h2>
+      <h2 align="center">Temperature &nbsp; <i class="fa fa-thermometer-half"></i> </h2>
       <div id="temp"></div>
     </div>
 
@@ -35,27 +35,27 @@
   //each event is associated with the corresponding div in order to show the received value
   socket.on('temperature', function(data){
       var payload = data.split(" ");
-      $('#temp').html('<h4 align="center">' + payload[0] + '&nbsp; °C </h4>');
+      $('#temp').html('<h6 align="center"> From device: <strong>' + payload[0] + '</strong> &nbsp; received value: <strong>' + payload[1] + '</strong> °C </h6>');
   });
 
   socket.on('humidity', function(data){
       var payload = data.split(" ");
-      $('#hum').html('<h4 align="center">' + payload[0] + '&nbsp; % </h4>');
+      $('#hum').html('<h6 align="center"> From device: <strong>' + payload[0] + '</strong> &nbsp; received value: <strong>' + payload[1] + '</strong> % </h6>');
   });
 
   socket.on('direction', function(data){
       var payload = data.split(" ");
-      $('#dir').html('<h4 align="center">' + payload[0] + '&nbsp; degrees </h4>');
+      $('#dir').html('<h6 align="center"> From device: <strong>' + payload[0] + '</strong> &nbsp; received value: <strong>' + payload[1] + '</strong> degrees </h6>');
   });
 
   socket.on('intensity', function(data){
       var payload = data.split(" ");
-      $('#int').html('<h4 align="center">' + payload[0] + '&nbsp; m/s </h4>');
+      $('#int').html('<h6 align="center">From device: <strong>' + payload[0] + '</strong> &nbsp; received value: <strong>' + payload[1] + '</strong> m/s </h6>');
   });
 
   socket.on('height', function(data){
       var payload = data.split(" ");
-      $('#hei').html('<h4 align="center">' + payload[0] + '&nbsp; mm/h </h4>');
+      $('#hei').html('<h6 align="center">From device: <strong>' + payload[0] + '</strong> &nbsp; received value: <strong>' + payload[1] + '</strong> mm/h </h6>');
   });
 
 </script>
