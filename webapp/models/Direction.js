@@ -3,6 +3,11 @@ const Schema = mongoose.Schema;
 
 //create Schema
 const DirectionSchema = new Schema({
+  deviceId:{
+    type: String,
+    required: true,
+    ref:'devices'
+  },
   value:{
     type: String,
     required: true

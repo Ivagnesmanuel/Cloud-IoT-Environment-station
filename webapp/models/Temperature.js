@@ -3,6 +3,11 @@ const Schema = mongoose.Schema;
 
 //create Schema
 const TemperatureSchema = new Schema({
+  deviceId:{
+    type: String,
+    required: true,
+    ref:'devices'
+  },
   value:{
     type: String,
     required: true

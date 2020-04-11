@@ -2,7 +2,7 @@
   <h1> Rain height  &nbsp; <i class="fas fa-cloud-rain"></i></h1>
 
   <div class="container">
-    <canvas id="myChart" width="500" height="230"></canvas>
+    <canvas id="myChart" width="500" height="200"></canvas>
   </div><br>
 
   {{#each metrics}}
@@ -11,12 +11,12 @@
       <h6 align="center">{{value}} mm/h</h6>
     </div>
   {{else}}
-      <p>No metrics found for the last hour</p>
+      <p>No metrics found</p>
   {{/each}}
 
   {{#if total}}
       <br>
-      <a class="btn btn-secondary" href="/heitotal" role="button"> &nbsp; &nbsp; See everything &nbsp; &nbsp;</a>
+      <a class="btn btn-secondary" href="/heitotal" role="button"> &nbsp; &nbsp;  Try to see old data &nbsp; &nbsp;</a>
   {{/if}}
 
 </div><br><br><br>

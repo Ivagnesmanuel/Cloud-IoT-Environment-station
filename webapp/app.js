@@ -11,15 +11,6 @@ var app = express();
 var server = require('http').createServer(app);     //needed for websocket
 var io = require('socket.io')(server);
 
-const port = process.env.PORT || 3000;
-server.listen(port, ()=>{
-  console.log(`Server started on port ${port}`);
-} );
-
-
-//load routes
-const index = require('./routes/index');
-app.use('/', index)
 
 //load keys
 const keys = require('./config/keys.js');
@@ -27,17 +18,19 @@ const keys = require('./config/keys.js');
 //connect to mongoose
 mongoose.connect(keys.mongoURI, {
   useUnifiedTopology: true,
- useNewUrlParser: true,
+  useNewUrlParser: true,
 })
   .then(() => console.log('MongoDb Connected'))      //use promise instead of callbacks for cleaner code
   .catch(err => console.log(err));
 
 //load models
+require('./models/Device');
 require('./models/Temperature');
 require('./models/Humidity');
 require('./models/Direction');
 require('./models/Intensity');
 require('./models/Height');
+const Device = mongoose.model('devices');
 const Temperature = mongoose.model('temperatureValues');
 const Humidity = mongoose.model('humidityValues');
 const Direction = mongoose.model('directionValues');
@@ -58,43 +51,61 @@ function listenForMessages() {
     // Create an event handler to handle messages
     const messageHandler = message => {
       console.log(`Received message ${message.id}:`);
-      console.log(`\tData: ${message.data}`);
-      var payload = `${message.data}`.split(" ");
+      console.log(`\tData => ${message.data}`);
+      const msg = `${message.data}`.split(": ");
+      const deviceId = msg[0];
+      const payload = msg[1].split(" ");
 
-      // create the new Telemetry object
-      const newTelemetry = {
-        value: payload[1],
-        date: payload[2]
-      }
+      Device.findOne(                       //to check if device already in
+        {deviceId:deviceId}
+      ).then(device =>{
 
-      // needed for the interactive home page
-      if(payload[0] == "temperature"){                      //recognition by deviceID
-        io.emit("temperature", payload[1]+" "+payload[2]);  //value time
-        new Temperature(newTelemetry).save();
-      }
+          if (!device){
+            //create the new event object
+            const newDevice = {
+              deviceId:deviceId
+            }
 
-      if(payload[0] == "humidity"){
-        io.emit("humidity", payload[1]+" "+payload[2]);
-        new Humidity(newTelemetry).save();
-      }
+            new Device(newDevice).save();
+          }
+
+          // create the new Telemetry object
+          const newTelemetry = {
+            deviceId:device,
+            value: payload[1],
+            date: payload[2]
+          }
+
+          // needed for the interactive home page
+          if(payload[0] == "temperature"){                      //recognition by deviceID
+            io.emit("temperature", payload[1]+" "+payload[2]);  //value time
+            new Temperature(newTelemetry).save();
+          }
+
+          if(payload[0] == "humidity"){
+            io.emit("humidity", payload[1]+" "+payload[2]);
+            new Humidity(newTelemetry).save();
+          }
 
 
-      if(payload[0] == "direction"){
-        io.emit("direction", payload[1]+" "+payload[2]);
-        new Direction(newTelemetry).save();
-      }
+          if(payload[0] == "direction"){
+            io.emit("direction", payload[1]+" "+payload[2]);
+            new Direction(newTelemetry).save();
+          }
 
 
-      if(payload[0] == "intensity"){
-        io.emit("intensity", payload[1]+" "+payload[2]);
-        new Intensity(newTelemetry).save();
-      }
+          if(payload[0] == "intensity"){
+            io.emit("intensity", payload[1]+" "+payload[2]);
+            new Intensity(newTelemetry).save();
+          }
 
 
-      if(payload[0] == "height"){
-        io.emit("height", payload[1]+" "+payload[2]);
-        new Height(newTelemetry).save();
-      }
+          if(payload[0] == "height"){
+            io.emit("height", payload[1]+" "+payload[2]);
+            new Height(newTelemetry).save();
+          }
+
+      });
 
 
       // "Ack" (acknowledge receipt of) the message
@@ -183,8 +194,19 @@ app.set('view engine', 'handlebars');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+//method override middleware
+app.use(methodOverride('_method'));
+
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-//method override middleware
-app.use(methodOverride('_method'));
+
+//load routes
+const index = require('./routes/index');
+app.use('/', index)
+
+
+const port = process.env.PORT || 3000;
+server.listen(port, ()=>{
+  console.log(`Server started on port ${port}`);
+} );

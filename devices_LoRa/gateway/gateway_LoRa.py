@@ -4,6 +4,7 @@ import paho.mqtt.client as mqtt
 global minimum_backoff_time
 global MAXIMUM_BACKOFF_TIME
 
+
 # SETUP GOOGLE
 project_id = 'iot-assign1'
 registry_id = 'my-registry'
@@ -19,8 +20,9 @@ mqtt_bridge_hostname = 'mqtt.googleapis.com'
 mqtt_bridge_port = 443
 
 #SETUP TheThingsNetwork
-ttn_app_id = "enviroment_station"                                               #from another file
-ttn_access_key = "ttn-account-v2.D6VffhWRWkBq_bSesXqAQi-mZnw7g3JCuOp048PfFXw"   #from another file
+f = open("ttn_password.txt", "r")
+ttn_app_id = "enviroment_station"
+ttn_access_key = f.readline()                         #from ttn_password.txt
 ttn_host = 'eu.thethings.network'
 ttn_port = 1883
 

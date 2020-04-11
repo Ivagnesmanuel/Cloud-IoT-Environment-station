@@ -2,7 +2,7 @@
     <h1> Temperature &nbsp;<i class="fa fa-thermometer-half"></i></h1>
 
     <div class="container">
-      <canvas id="myChart" width="500" height="230"></canvas>
+      <canvas id="myChart" width="500" height="200"></canvas>
     </div><br>
 
     {{#each metrics}}
@@ -58,7 +58,8 @@
   socket.on('temperatureTele', function(data){
     data.forEach( tele => {
       myChart.data.datasets[0].data.push(parseInt(tele.value))
-      myChart.data.labels.push(parseInt(tele.date)/1000)
+      myChart.data.labels.push(" ")
+      //myChart.data.labels.push(parseInt(tele.date))
     });
     myChart.update();
   });

@@ -3,6 +3,11 @@ const Schema = mongoose.Schema;
 
 //create Schema
 const HeightSchema = new Schema({
+  deviceId:{
+    type: String,
+    required: true,
+    ref:'devices'
+  },
   value:{
     type: String,
     required: true

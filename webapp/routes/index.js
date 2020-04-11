@@ -1,13 +1,15 @@
 const express = require('express');
-const router = express.Router();
 const mongoose = require('mongoose');
+const router = express.Router();
 
 //load models
+require('./../models/Device');
 require('./../models/Temperature');
 require('./../models/Humidity');
 require('./../models/Direction');
 require('./../models/Intensity');
 require('./../models/Height');
+const Device = mongoose.model('devices');
 const Temperature = mongoose.model('temperatureValues');
 const Humidity = mongoose.model('humidityValues');
 const Direction = mongoose.model('directionValues');
