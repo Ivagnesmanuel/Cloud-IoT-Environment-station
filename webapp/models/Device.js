@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-//create Schema
+//create Schema for devices
 const DeviceSchema = new Schema({
   deviceId:{
     type: String,

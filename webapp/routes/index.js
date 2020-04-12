@@ -25,7 +25,6 @@ router.get('/', (req,res) => {
 
 //////////////////// devices telemetry indexs ////////////////////
 router.get('/temperatureIndex', (req,res) => {
-    //gets only telemetry associated to the device
     Device.find({}).then(devices => {
         res.render('index/temperatureIndex', {
           devices:devices,
@@ -35,7 +34,6 @@ router.get('/temperatureIndex', (req,res) => {
 
 
 router.get('/humidityIndex', (req,res) => {
-    //gets only telemetry associated to the device
     Device.find({}).then(devices => {
         res.render('index/humidityIndex', {
           devices:devices,
@@ -45,7 +43,6 @@ router.get('/humidityIndex', (req,res) => {
 
 
 router.get('/directionIndex', (req,res) => {
-    //gets only telemetry associated to the device
     Device.find({}).then(devices => {
         res.render('index/directionIndex', {
           devices:devices,
@@ -55,7 +52,6 @@ router.get('/directionIndex', (req,res) => {
 
 
 router.get('/intensityIndex', (req,res) => {
-    //gets only telemetry associated to the device
     Device.find({}).then(devices => {
         res.render('index/intensityIndex', {
           devices:devices,
@@ -65,7 +61,6 @@ router.get('/intensityIndex', (req,res) => {
 
 
 router.get('/heightIndex', (req,res) => {
-    //gets only telemetry associated to the device
     Device.find({}).then(devices => {
         res.render('index/heightIndex', {
           devices:devices,
@@ -85,6 +80,7 @@ router.get('/temperature/:id', (req,res) => {
     .sort({date:'desc'})
     .then(metrics => {
 
+      //to extract device name
       Device.findOne({
          _id:req.params.id
       }).then(device => {
@@ -96,7 +92,6 @@ router.get('/temperature/:id', (req,res) => {
       });
     });
 })
-
 
 
 router.get('/humidity/:id', (req,res) => {
@@ -118,6 +113,7 @@ router.get('/humidity/:id', (req,res) => {
     });
 })
 
+
 router.get('/direction/:id', (req,res) => {
   Direction.find({
     deviceId: req.params.id
@@ -135,7 +131,6 @@ router.get('/direction/:id', (req,res) => {
         })
       });
     });
-
 })
 
 router.get('/intensity/:id', (req,res) => {
@@ -157,6 +152,7 @@ router.get('/intensity/:id', (req,res) => {
     });
 })
 
+
 router.get('/height/:id', (req,res) => {
   Height.find({
       deviceId: req.params.id,
@@ -175,7 +171,6 @@ router.get('/height/:id', (req,res) => {
       });
     });
 })
-
 
 
 module.exports = router;

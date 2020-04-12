@@ -20,7 +20,7 @@ mongoose.connect(keys.mongoURI, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
 })
-  .then(() => console.log('MongoDb Connected'))      //use promise instead of callbacks for cleaner code
+  .then(() => console.log('MongoDb Connected'))     //use promise instead of callbacks for cleaner code
   .catch(err => console.log(err));
 
 //load models
@@ -53,61 +53,63 @@ function listenForMessages() {
       console.log(`Received message ${message.id}:`);
       console.log(`\tData => ${message.data}`);
       const msg = `${message.data}`.split(": ");
-      const deviceId = msg[0];
-      const payload = msg[1].split(" ");
 
-      Device.findOne(                       //to check if device already in
+      const deviceId = msg[0];
+      const telemetryList = msg[1].split("; ");       //split the list of telemetries
+      const date = msg[2]
+
+      Device.findOne(                                 //to check if device already in
         {deviceId:deviceId}
       ).then(device =>{
 
-          // if it is a new device, create the new device object
+          // first message from a new device, just save it
           if (!device){
             const newDevice = {
               deviceId:deviceId
             }
             new Device(newDevice).save()
-
           } else {
 
-          // create directly the new Telemetry object
-          const newTelemetry = {
-              deviceId:device._id,
-              value: payload[1],
-              date: payload[2]
-            }
 
-          // emit and save the new telemetry
-          if(payload[0] == "temperature"){                      //recognition by deviceID
-            io.emit("temperature", deviceId+" "+payload[1]);  //value time
-            new Temperature(newTelemetry).save();
-          }
+          // iterate through the telemetries in the payload
+          telemetryList.forEach((item, i) => {
+              payload = item.split(" ");
 
-          if(payload[0] == "humidity"){
-            io.emit("humidity", deviceId+" "+payload[1]);
-            new Humidity(newTelemetry).save();
-          }
+              // create directly the new Telemetry object
+              const newTelemetry = {
+                  deviceId:device._id,
+                  value:payload[1],
+                  date:date
+                }
 
+              // emit and save the new telemetry
+              if(payload[0] == "temperature"){
+                io.emit("temperature", deviceId+" "+payload[1]);    //send only value to home
+                new Temperature(newTelemetry).save();
+              }
 
-          if(payload[0] == "direction"){
-            io.emit("direction", deviceId+" "+payload[1]);
-            new Direction(newTelemetry).save();
-          }
+              if(payload[0] == "humidity"){
+                io.emit("humidity", deviceId+" "+payload[1]);
+                new Humidity(newTelemetry).save();
+              }
 
+              if(payload[0] == "direction"){
+                io.emit("direction", deviceId+" "+payload[1]);
+                new Direction(newTelemetry).save();
+              }
 
-          if(payload[0] == "intensity"){
-            io.emit("intensity", deviceId+" "+payload[1]);
-            new Intensity(newTelemetry).save();
-          }
+              if(payload[0] == "intensity"){
+                io.emit("intensity", deviceId+" "+payload[1]);
+                new Intensity(newTelemetry).save();
+              }
 
-
-          if(payload[0] == "height"){
-            io.emit("height", deviceId+" "+payload[1]);
-            new Height(newTelemetry).save();
-          }
+              if(payload[0] == "height"){
+                io.emit("height", deviceId+" "+payload[1]);
+                new Height(newTelemetry).save();
+              }
+          });
         }
-
       });
-
 
       // "Ack" (acknowledge receipt of) the message
       message.ack();
@@ -179,8 +181,7 @@ rain.on('connection', function(socket){
 });
 
 
-
-
+//////////////////// other components ////////////////////
 //handlebars helpers
 const {
   stripTags,

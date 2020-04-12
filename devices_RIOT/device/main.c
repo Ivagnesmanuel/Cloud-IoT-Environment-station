@@ -30,23 +30,18 @@ static char topics[NUMOFSUBS][TOPIC_MAXLEN];
 
 //**********************************************************************
 
-//function to generate the payload to send
-static char* gen_payload(char* device, int min, int max)
+//function to add parameters to the payload
+static int add_payload(char* payload, char* telemetry, int min, int max)
 {
     char value[10];
     sprintf(value, "%d", min + rand() % (max+1 - min));
-    char date[20];
-    sprintf(date, "%lu", ((unsigned long)time(NULL)));
 
-    char* payload = malloc(sizeof(char)*60);
-    strcpy(payload, device);
+    strcat(payload, telemetry);
     strcat(payload, " ");
     strcat(payload, value);
-    strcat(payload, " ");
-    strcat(payload, date);
-    strcat(payload, "000");
+    //strcat(payload, "; ");
 
-	return payload;
+	return 0;
 }
 //**********************************************************************
 
@@ -182,13 +177,14 @@ static int cmd_infinite(int argc, char **argv)
     unsigned flags = EMCUTE_QOS_0;
     char* payload;
 
-    if (argc < 3) {
-        puts("Missing values, correct usage: start [interval] [telemetries to send separated by space]\n\n");
+    if (argc < 4) {
+        puts("Missing values, correct usage: start [device name] [interval] [telemetries to send separated by space]\n\n");
         puts("The possible values for telemetries are:\n	temperature\n	humidity\n	wind_direction\n	wind_intensity\n	rain_height\n\n");
         return 1;
     }
 
-    short interval = atoi(argv[1]);
+	  char* deviceid = argv[1];
+    short interval = atoi(argv[2]);
     t.name = "telemetry";
     if (emcute_reg(&t) != EMCUTE_OK) {
         puts("error: unable to obtain topic ID");
@@ -197,38 +193,52 @@ static int cmd_infinite(int argc, char **argv)
 
 
     while(1){
-  		//send temperature value
 
+      // initialize the payload with the deviceid
+      payload = malloc(sizeof(char)*200);
+      strcpy(payload, deviceid);
+      strcat(payload, ": ");
+
+      // add selected components to the payload
 	    short i;
-   		for (i=2; i<argc; i++){
+   		for (i=3; i<argc; i++){
    			if (strcmp(argv[i],"temperature") == 0)
-   				payload = gen_payload("temperature", -50, 50);
+   				add_payload(payload, "temperature", -50, 50);
 
    			else if (strcmp(argv[i],"humidity") == 0)
-   				payload = gen_payload("humidity", 0, 100);
+   				add_payload(payload, "humidity", 0, 100);
 
    			else if (strcmp(argv[i],"wind_direction") == 0)
-   				payload = gen_payload("direction", 0, 360);
+   				add_payload(payload, "direction", 0, 360);
 
    			else if (strcmp(argv[i],"wind_intensity") == 0)
-   				payload = gen_payload("intensity", 0, 100);
+   				add_payload(payload, "intensity", 0, 100);
 
    			else if (strcmp(argv[i],"rain_height") == 0)
-   				payload = gen_payload("height", 0, 50);
+   				add_payload(payload, "height", 0, 50);
 
+        if (i != argc-1){
+          strcat(payload, "; ");
+        } else {
+          strcat(payload, ": ");
+        }
+      }
 
-   			if (emcute_pub(&t, payload, strlen(payload), flags) != EMCUTE_OK) {
-        		printf("error: unable to publish data to topic '%s [%i]'\n",
-                	t.name, (int)t.id);
-        		return 1;
-    		}
-    		printf("Published to topic %s the payload: [ %s ]\n", t.name, (char*) payload);
+      // add the date
+      char date[20];
+      sprintf(date, "%lu", ((unsigned long)time(NULL)));
+      strcat(payload, date);
+      strcat(payload, "000");
 
-			  free(payload);
-    		xtimer_sleep(1);
-   		}
+      //send the payload
+ 			if (emcute_pub(&t, payload, strlen(payload), flags) != EMCUTE_OK) {
+      		printf("error: unable to publish data to topic '%s [%i]'\n",
+              	t.name, (int)t.id);
+      		return 1;
+  		}
+  		printf("Published to topic %s the payload: [ %s ]\n", t.name, (char*) payload);
 
-
+			free(payload);
       xtimer_sleep(interval);
 
     }

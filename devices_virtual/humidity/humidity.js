@@ -51,7 +51,7 @@ const publishAsync = (
   setTimeout(() => {
     const humidity = getRandomArbitrary(0, 100);
     var date = parseInt(Date.now());
-    const payload = "virtual:"+" "+deviceId+" "+humidity+" "+date;
+    const payload = "virtual: "+deviceId+" "+humidity+": "+date;
 
     // Publish "payload" to the MQTT topic. qos=1 means at least once delivery.
     console.log('Publishing message  => ', payload);
