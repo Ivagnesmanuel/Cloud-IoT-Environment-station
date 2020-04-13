@@ -1,13 +1,20 @@
 This folder contains the web application used to visualize all the telemetries retrieved from the devices.
 
-```webapp
+```
+Cloud-IoT-enviroment-station/webapp
+├── README.md
 ├── app.js
 ├── config
+│   └── keys.js
 ├── helpers
 │   └── hbs.js
 ├── models
-│   └── telemetry.js
-├── package-lock.json
+│   ├── Device.js
+│   ├── Direction.js
+│   ├── Height.js
+│   ├── Humidity.js
+│   ├── Intensity.js
+│   └── Temperature.js
 ├── package.json
 ├── public
 │   └── css
@@ -17,13 +24,20 @@ This folder contains the web application used to visualize all the telemetries r
 └── views
     ├── index
     │   ├── direction.handlebars
+    │   ├── directionIndex.handlebars
     │   ├── height.handlebars
+    │   ├── heightIndex.handlebars
     │   ├── home.handlebars
     │   ├── humidity.handlebars
+    │   ├── humidityIndex.handlebars
     │   ├── intensity.handlebars
-    │   └── temperature.handlebars
+    │   ├── intensityIndex.handlebars
+    │   ├── temperature.handlebars
+    │   └── temperatureIndex.handlebars
     ├── layouts
     │   └── main.handlebars
     └── partials
         └── _navbar.handlebars
+
+10 directories, 26 files
 ```
