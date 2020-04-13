@@ -22,10 +22,9 @@ mqtt_bridge_port = 443
 #SETUP TheThingsNetwork
 f = open("ttn_password.txt", "r")
 ttn_app_id = "enviroment_station"
-ttn_access_key = f.readline()                         #from ttn_password.txt
+ttn_access_key = f.readline().strip()                        #from ttn_password.txt
 ttn_host = 'eu.thethings.network'
 ttn_port = 1883
-
 
 print('****************** Gateway actived ******************');
 
@@ -42,8 +41,7 @@ def on_connect_ttn(client, userdata, flags, rc):
 def on_message_ttn(client, userdata, msg):
     print("Received message from TTN: "+msg.topic+" "+str(msg.payload))
     formatted_payload = json.loads(msg.payload)
-    #to_send = formatted_payload['dev_id'] + " " + formatted_payload['payload_raw'].decode('base64')
-    to_send = formatted_payload['payload_raw'].decode('base64')
+    to_send = formatted_payload['payload_raw'].decode('base64') + formatted_payload['metadata']['time']
     google_client.publish(mqtt_topic, to_send, qos=0)
 
 #######################################################################################################################################
@@ -171,6 +169,8 @@ def get_client(
 
 
 if __name__ == "__main__":
+    minimum_backoff_time = 1
+    MAXIMUM_BACKOFF_TIME = 32
 
 	#client connetted to TTN
 	gate = mqtt.Client()
@@ -200,7 +200,7 @@ if __name__ == "__main__":
 				# If backoff time is too large, give up.
 				if minimum_backoff_time > MAXIMUM_BACKOFF_TIME:
 					print('Exceeded maximum backoff time. Giving up.')
-            				break
+                    break
 
         			# Otherwise, wait and connect again.
         			delay = minimum_backoff_time + random.randint(0, 1000) / 1000.0

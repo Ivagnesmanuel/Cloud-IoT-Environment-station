@@ -1,4 +1,6 @@
-This folder contains the extension including the RIOT-OS devices, the MQTT-SN protocol and the transparent gateway, the relatives links are below.
+## Section 2 
+
+This folder contains the extension with the RIOT-OS devices using the MQTT-SN protocol. For more information about this section use the links below.
 
 ### links
 - [Youtube demonstration](https://youtu.be/zVOfD81fPKc)

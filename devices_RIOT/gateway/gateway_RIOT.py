@@ -328,6 +328,8 @@ def get_client(
 
 
 if __name__ == "__main__":
+    minimum_backoff_time = 1
+    MAXIMUM_BACKOFF_TIME = 32
 
 	#client connetted to devices
 	gate = Client("linh", port=1885)

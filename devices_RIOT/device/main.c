@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "random.h"
 #include "shell.h"
 #include "msg.h"
 #include "net/emcute.h"
@@ -33,13 +34,12 @@ static char topics[NUMOFSUBS][TOPIC_MAXLEN];
 //function to add parameters to the payload
 static int add_payload(char* payload, char* telemetry, int min, int max)
 {
-    char value[10];
-    sprintf(value, "%d", min + rand() % (max+1 - min));
+    char value[5];
+    sprintf(value, "%d", min + random_uint32() % (max+1 - min));
 
     strcat(payload, telemetry);
     strcat(payload, " ");
     strcat(payload, value);
-    //strcat(payload, "; ");
 
 	return 0;
 }
@@ -175,10 +175,9 @@ static int cmd_infinite(int argc, char **argv)
 {
     emcute_topic_t t;
     unsigned flags = EMCUTE_QOS_0;
-    char* payload;
 
     if (argc < 4) {
-        puts("Missing values, correct usage: start [device name] [interval] [telemetries to send separated by space]\n\n");
+        puts("Missing values, correct usage: start [deviceID] [interval] [telemetries to send separated by space]\n\n");
         puts("The possible values for telemetries are:\n	temperature\n	humidity\n	wind_direction\n	wind_intensity\n	rain_height\n\n");
         return 1;
     }
@@ -195,7 +194,7 @@ static int cmd_infinite(int argc, char **argv)
     while(1){
 
       // initialize the payload with the deviceid
-      payload = malloc(sizeof(char)*200);
+      char payload[120];
       strcpy(payload, deviceid);
       strcat(payload, ": ");
 
@@ -238,7 +237,6 @@ static int cmd_infinite(int argc, char **argv)
   		}
   		printf("Published to topic %s the payload: [ %s ]\n", t.name, (char*) payload);
 
-			free(payload);
       xtimer_sleep(interval);
 
     }
@@ -345,7 +343,7 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    puts("****************** Device1 started the execution ******************\n");
+    puts("****************** The device started the execution ******************\n");
 
 
     /* the main thread needs a msg queue to be able to run `ping6`*/

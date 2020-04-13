@@ -10,29 +10,63 @@
 #include "thread.h"
 #include "msg.h"
 #include "xtimer.h"
+#include "random.h"
 
 #include "shell.h"
 #include "semtech_loramac.h"
 
 extern semtech_loramac_t loramac;
 
-// function to generate the payload to send
-static char* gen_payload(char* device, int min, int max)
+#ifdef MODULE_SEMTECH_LORAMAC_RX
+#define LORAMAC_RECV_MSG_QUEUE                   (4U)
+static msg_t _loramac_recv_queue[LORAMAC_RECV_MSG_QUEUE];
+static char _recv_stack[THREAD_STACKSIZE_DEFAULT];
+
+static void *_wait_recv(void *arg)
+{
+    msg_init_queue(_loramac_recv_queue, LORAMAC_RECV_MSG_QUEUE);
+
+    (void)arg;
+    while (1) {
+        /* blocks until something is received */
+        switch (semtech_loramac_recv(&loramac)) {
+            case SEMTECH_LORAMAC_RX_DATA:
+                loramac.rx_data.payload[loramac.rx_data.payload_len] = 0;
+                printf("Data received: %s, port: %d\n",
+                (char *)loramac.rx_data.payload, loramac.rx_data.port);
+                break;
+
+            case SEMTECH_LORAMAC_RX_LINK_CHECK:
+                printf("Link check information:\n"
+                   "  - Demodulation margin: %d\n"
+                   "  - Number of gateways: %d\n",
+                   loramac.link_chk.demod_margin,
+                   loramac.link_chk.nb_gateways);
+                break;
+
+            case SEMTECH_LORAMAC_RX_CONFIRMED:
+                puts("Received ACK from network");
+                break;
+
+            default:
+                break;
+        }
+    }
+    return NULL;
+}
+#endif
+
+//function to add parameters to the payload
+static int add_payload(char* payload, char* telemetry, int min, int max)
 {
     char value[10];
-    sprintf(value, "%d", min + rand() % (max+1 - min));
-    char date[20];
-    sprintf(date, "%lu", ((unsigned long)time(NULL)));
+    sprintf(value, "%hd", (short) (min + random_uint32() % (max+1 - min)));
 
-    char* payload = malloc(sizeof(char)*60);
-    strcpy(payload, device);
+    strcat(payload, telemetry);
     strcat(payload, " ");
     strcat(payload, value);
-    strcat(payload, " ");
-    strcat(payload, date);
-    strcat(payload, "000");
 
-	return payload;
+	  return 0;
 }
 
 
@@ -67,7 +101,6 @@ static int loramac_send(char* payload){
             return 1;
     }
 
-    printf("Message sent: %s ", payload);
     return 0;
 }
 
@@ -76,56 +109,70 @@ static int loramac_send(char* payload){
 static int cmd_infinite(int argc, char **argv)
 {
 
+    // check that connection with TTN is enstablished
     if (semtech_loramac_join(&loramac, LORAMAC_JOIN_OTAA)!=SEMTECH_LORAMAC_ALREADY_JOINED){
       puts("You need to join TTN first, read the tutorial!\n");
       return 1;
     }
 
-    char* payload = "";
-    short interval = atoi(argv[1]);
-
-    if (argc < 3) {
-        puts("Missing values, correct usage: start [interval] [telemetries to send separated by space]\n\n");
+    if (argc < 4) {
+        puts("Missing values, correct usage: start [deviceID] [interval] [telemetries to send separated by space]\n\n");
         puts("The possible values for telemetries are:\n	temperature\n	humidity\n	wind_direction\n	wind_intensity\n	rain_height\n\n");
         return 1;
     }
 
+
+    char* deviceid = argv[1];
+    short interval = atoi(argv[2]);
+
     while(1){
-  		//send temperature value
 
-	    short i;
-   		for (i=2; i<argc; i++){
-   			if (strcmp(argv[i],"temperature") == 0)
-   				payload = gen_payload("temperature", -50, 50);
-
-   			else if (strcmp(argv[i],"humidity") == 0)
-   				payload = gen_payload("humidity", 0, 100);
-
-   			else if (strcmp(argv[i],"wind_direction") == 0)
-   				payload = gen_payload("direction", 0, 360);
-
-   			else if (strcmp(argv[i],"wind_intensity") == 0)
-   				payload = gen_payload("intensity", 0, 100);
-
-   			else if (strcmp(argv[i],"rain_height") == 0)
-   				payload = gen_payload("height", 0, 50);
+        // initialize the payload with the deviceid
+        // the size of the buffer does not really influence the performance
+        // the send primitive will remove the excess
+        char payload[120];
+        strcpy(payload, deviceid);
+        strcat(payload, ": ");
 
 
-        short attempt = 0;
-        while (attempt < 3){
-          if (loramac_send(payload)) {
-              printf("Error occurred while transmitting... attempt number %d of 3\n", attempt);
-	            attempt++;
-          }   else {
-            printf("Sent: [ %s ]\n", (char*) payload);
+        // add selected components to the payload
+        short i;
+        for (i=3; i<argc; i++){
+          if (strcmp(argv[i],"temperature") == 0)
+            add_payload(payload, "temperature", -50, 50);
+
+          else if (strcmp(argv[i],"humidity") == 0)
+            add_payload(payload, "humidity", 0, 100);
+
+          else if (strcmp(argv[i],"wind_direction") == 0)
+            add_payload(payload, "direction", 0, 360);
+
+          else if (strcmp(argv[i],"wind_intensity") == 0)
+            add_payload(payload, "intensity", 0, 100);
+
+          else if (strcmp(argv[i],"rain_height") == 0)
+            add_payload(payload, "height", 0, 50);
+
+          if (i != argc-1){
+            strcat(payload, "; ");
+          } else {
+            strcat(payload, ": ");
           }
-          xtimer_sleep(10);
         }
 
-    		xtimer_sleep(10);
-   		}
+        // try to send the payload 5 times
+        short attempt = 0;
+        while (attempt < 5){
+          if (loramac_send(payload)) {
+              printf("Error occurred while transmitting... attempt number %d of 5\n", attempt);
+	            attempt++;
+	            xtimer_sleep(10);
+          }   else {
+              printf("Sent: [ %s ]\n", (char*) payload);
+	            attempt=5;
+          }
+        }
 
-      free(payload);
     	xtimer_sleep(interval);
 
     }
@@ -141,7 +188,12 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    puts("****************** Device1 started the execution ******************\n");
+    #ifdef MODULE_SEMTECH_LORAMAC_RX
+      thread_create(_recv_stack, sizeof(_recv_stack),
+                    THREAD_PRIORITY_MAIN - 1, 0, _wait_recv, NULL, "recv thread");
+    #endif
+
+    puts("****************** The device started the execution ******************\n");
 
     /* start shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];

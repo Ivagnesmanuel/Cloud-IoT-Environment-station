@@ -1,4 +1,6 @@
-This folder contains the Node.js virtual sensors used for the first part of the project, the relatives links are below.
+## Section 1
+
+This folder contains the Node.js virtual sensors used for the first part of the project. For more information about this section use the links below.
 
 ### links
 - [Youtube demonstration](https://youtu.be/MFi_sELNDRY)
