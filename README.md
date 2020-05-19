@@ -12,7 +12,6 @@ These are divided into different parts, one for each assignment, each of them co
 ## Section 1
 This section contains the introduction to the project, the Node.js virtual sensors, and the first version of the dashboard.
 
-### links
 - [Youtube demonstration](https://youtu.be/MFi_sELNDRY)
 - [Hands-on tutorial](https://www.hackster.io/ivagnesmanuel/iot-2020-assignment1-13aa68)
 
@@ -20,7 +19,6 @@ This section contains the introduction to the project, the Node.js virtual senso
 ## Section 2
 Build on-top of the cloud-based components developed in the first section, here there is the first extension, including the RIOT-OS devices, the MQTT-SN protocol, and the MQTT-SN/MQTT transparent gateway.
 
-### links
 - [Youtube demonstration](https://youtu.be/zVOfD81fPKc)
 - [Hands-on tutorial](https://www.hackster.io/ivagnesmanuel/iot-2020-assignment2-5069b8)
 
@@ -30,7 +28,6 @@ Build on-top of the cloud-based components developed in the first section, here 
 The goal of this section is to add to the collection new RIOT-OS devices, which this time use the LoRa low-power wide-area network technology and are connected to the Cloud backend through TheThingsNetwork.
 Moreover, this time, I have also uploaded the code on real hardware, on the B-L072Z-LRWAN1 LoRa kit, using the IoT-LAB testbed.
 
-### links
 - [Youtube demonstration](https://www.youtube.com/watch?v=g2B8veH1yhc)
 - [Hands-on tutorial](https://www.hackster.io/ivagnesmanuel/testing-riot-os-devices-on-iot-lab-using-lorawan-and-ttn-fb8115)
 
