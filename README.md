@@ -1,6 +1,6 @@
 # IOT environment station
 
-This project has been made, through different assignments, for the "Internet of Things" course at "La Sapienza University of Rome". The final goal was to build a cloud-based IoT system that collects information from a set of environmental sensors using the MQTT protocol, which is controlled by a Google cloud IoT platform backend, implementing the Core-IoT and Pub/Sub API.
+This project has been done, through different assignments, for the "Internet of Things" course at "La Sapienza University of Rome". The final goal was to build a cloud-based IoT system that collects information from a set of environmental sensors using the MQTT protocol, which is controlled by a Google cloud IoT platform backend, implementing the Core-IoT and Pub/Sub API.
 To visualize the results, I have also implemented a dashboard, showing the current values, the last hour values, and finally all the values collected by the application.
 
 To understand how does it work, I suggest you take a look at the hands-on tutorials and the Youtube demonstrations.
@@ -32,5 +32,13 @@ Moreover, this time, I have also uploaded the code on real hardware, on the B-L0
 - [Hands-on tutorial](https://www.hackster.io/ivagnesmanuel/testing-riot-os-devices-on-iot-lab-using-lorawan-and-ttn-fb8115)
 
 
+## Extra section
+This section refers to the 4 assignment, which is not connected anymore to the environment station. This time, the goal is to build crowd-sensing web application for Human Activity Recognition using generic sensors API.
+
+- [Youtube demonstration](https://www.youtube.com/watch?v=CaPbKQVNFsY)
+- [Hands-on tutorial](https://www.hackster.io/ivagnesmanuel/human-activity-recognition-using-generic-sensors-api-a93161)
+
+
+---
 **Note**: All the code is made to work with my credentials on my personal google account.
-I did not upload the keys, If u want to run it, you need to make your own setup.
+I did not upload the keys, If you want to run it, you need to make your own setup.
