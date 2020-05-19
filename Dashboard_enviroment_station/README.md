@@ -1,4 +1,6 @@
-This folder contains the web application used to visualize all the telemetries retrieved from the devices.
+## Enviroment dashboard
+
+This folder contains the web application for the enviroment station, used to visualize all the telemetries retrieved from the devices.
 
 ```
 Cloud-IoT-enviroment-station/webapp
